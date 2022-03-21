@@ -1,0 +1,29 @@
+﻿@page "/"
+@inject SysendJs sysend
+
+<PageTitle>Index</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
+<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
+
+@foreach(var item in guids)
+{
+	<MudText Typo="Typo.h3">@item.id</MudText>
+}
+
+@code {
+
+	private List<(string id, bool primary)> guids = new List<(string id, bool primary)>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await sysend.OpenAsync();
+		guids = await sysend.GetWindows();
+
+		foreach(var guid  in guids)
+		{
+			Console.WriteLine($"{guid.id} | primary: {guid.primary}");
+		}
+		StateHasChanged();
+	}
+}

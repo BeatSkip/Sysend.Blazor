@@ -1,0 +1,3 @@
+[submodule "Sysend.Blazor/wwwroot/sysend.js"]
+	path = Sysend.Blazor/wwwroot/sysend.js
+	url = https://github.com/jcubic/sysend.js.git
