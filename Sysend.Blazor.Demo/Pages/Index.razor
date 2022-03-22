@@ -3,27 +3,56 @@
 
 <PageTitle>Index</PageTitle>
 
+
 <MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
 <MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
 
-@foreach(var item in guids)
-{
-	<MudText Typo="Typo.h3">@item.id</MudText>
-}
+<MudList>
+    <MudListItem>
+		<MudCard>
+			<MudTextField @bind-Value="TextIdentifier" Label="Standard" Variant="Variant.Text"></MudTextField>
+		</MudCard>
+        
+    </MudListItem>
+
+	@foreach(var item in guids)
+	{
+		<MudListItem>
+		    <MudText Typo="Typo.h3" GutterBottom="true">@item</MudText>
+		</MudListItem>
+	}
+    
+</MudList>
+
 
 @code {
 
-	private List<(string id, bool primary)> guids = new List<(string id, bool primary)>();
+	private List<string> guids = new List<string>();
 
-	protected override async Task OnInitializedAsync()
+
+	private string text = "Sysend";
+
+	public string TextIdentifier {
+		get { return text; } 
+		set { if (text != value)
+				sysend.UpdateIdentifier(value);
+			text = value; } 
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
-		await sysend.OpenAsync();
-		guids = await sysend.GetWindows();
-
-		foreach(var guid  in guids)
-		{
-			Console.WriteLine($"{guid.id} | primary: {guid.primary}");
+		if(firstRender){
+			sysend.ClientsUpdated += ClientsUpdated;
+			await sysend.StartAsync();
+			StateHasChanged();
 		}
+
+	}
+
+	private void ClientsUpdated(object sender, EventArgs e)
+	{
+		guids = sysend.GetClients();
 		StateHasChanged();
 	}
+
 }
