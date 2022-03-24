@@ -61,35 +61,63 @@ namespace Sysend.Blazor
 
 		#region Sysend Interop
 
+		/// <summary>
+		/// Set listener for specific channel and callback when a message is received on this channel
+		/// </summary>
+		/// <param name="channel">channel that you want to subscribe to</param>
+		/// <param name="callback">callback function that gets called on reception E.g: 'async Task callback(string data, string channel)'</param>
+		/// <returns>Task</returns>
 		public async Task On(string channel, Func<string, string, Task> callback)
 		{
 			await jsRuntime.InvokeVoidAsync("sysend.on", channel, CallBackInteropWrapper.Create<string, string>(callback));
 		}
 
+		/// <summary>
+		/// remove specific function as listener for a channel
+		/// </summary>
+		/// <param name="channel">channel that you want to unsubscribe from</param>
+		/// <param name="callback">callback function that has to be removed</param>
+		/// <returns>Task</returns>
 		public async Task Off(string channel, Func<string, string, Task> callback)
 		{
 			await jsRuntime.InvokeVoidAsync("sysend.off", channel, CallBackInteropWrapper.Create<string, string>(callback));
 		}
 
+		/// <summary>
+		/// broadcast a message on a specific channel
+		/// </summary>
+		/// <param name="channel">channel that you want to broadcast to</param>
+		/// <param name="message">message you want to send</param>
+		/// <returns>Task</returns>
 		public async Task Broadcast(string channel, string message)
 		{
 			await jsRuntime.InvokeVoidAsync("sysend.broadcast", channel, message);
 		}
 
-		public async Task<List<SysendItem>> List()
+
+		internal async Task<List<SysendItem>> List()
 		{
 			return await jsRuntime.InvokeAsync<List<SysendItem>>("sysend.list");
 		}
 
+		/// <summary>
+		/// Post a message to a specific client. clients can be retrieved from 'GetClients()'
+		/// </summary>
+		/// <param name="client">client name you want to send to</param>
+		/// <param name="message">message you want to send</param>
+		/// <returns>Task</returns>
 		public async Task Post(string client, string message)
 		{
-			await jsRuntime.InvokeVoidAsync("sysend.post", client, message);
+			if (!this.Clients.ContainsKey(client))
+				return;
+
+			await jsRuntime.InvokeVoidAsync("sysend.post", this.Clients[client], message);
 		}
 
-		public async Task Post(string client, object data)
-		{
-			await jsRuntime.InvokeVoidAsync("sysend.post", client, data);
-		}
+		//public async Task Post(string client, object data)
+		//{
+		//	await jsRuntime.InvokeVoidAsync("sysend.post", client, data);
+		//}
 
 		
 		#endregion

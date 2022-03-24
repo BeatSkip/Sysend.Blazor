@@ -13,5 +13,4 @@ builder.Services.AddMudServices();
 builder.Services.AddScoped<SysendJs>();
 
 
-
 await builder.Build().RunAsync();
